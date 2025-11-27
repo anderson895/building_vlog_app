@@ -1,0 +1,14 @@
+<!-- templates/vlogs/vlog_detail.html -->
+{% extends "vlogs/base.html" %}
+
+
+{% block content %}
+<h1>{{ vlog.title }}</h1>
+<p><strong>Author:</strong> {{ vlog.author.username }}</p>
+<p><strong>Published:</strong> {{ vlog.published_date }}</p>
+<p><strong>Category:</strong> {{ vlog.category }}</p>
+<p><strong>Tags:</strong> {{ vlog.tags }}</p>
+<iframe width="560" height="315" src="{{ vlog.video_url }}" frameborder="0" allowfullscreen></iframe>
+<p>{{ vlog.description }}</p>
+<a href="{% url 'vlog-list' %}">Back to all vlogs</a>
+{% endblock %}

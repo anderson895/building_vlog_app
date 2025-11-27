@@ -1,0 +1,104 @@
+{% extends "vlogs/base.html" %}
+{% block content %}
+
+
+
+<!-- Page Title -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary">All Vlogs</h2>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vlogModal">
+        Add New Vlog
+    </button>
+</div>
+
+<!-- Modal Form -->
+<div class="modal fade" id="vlogModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" action="{% url 'vlog-create' %}">
+        {% csrf_token %}
+        {% include 'vlogs/_form_fields.html' with form=form %}
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Vlog News Feed -->
+<div class="row">
+    {% for vlog in vlogs %}
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm border-0 rounded-4">
+            <!-- Card Header -->
+            <div class="card-header d-flex justify-content-between align-items-center bg-light border-0 rounded-top-4">
+                <div>
+                    <strong class="text-dark">{{ vlog.author.username }}</strong> • 
+                    <small class="text-muted">{{ vlog.published_date|date:"M d, Y" }}</small>
+                </div>
+                {% if request.user == vlog.author %}
+                <div>
+                    <a href="{% url 'vlog-edit' vlog.id %}" class="btn btn-sm btn-outline-secondary me-1">Edit</a>
+                    <form method="post" action="{% url 'vlog-delete' vlog.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this vlog?');">Delete</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body bg-white">
+                <h5 class="card-title text-primary fw-bold">{{ vlog.title }}</h5>
+                {% if vlog.video_url %}
+                    <div class="ratio ratio-16x9 mb-3">
+                        <iframe src="{{ vlog.video_url }}" title="{{ vlog.title }}" allowfullscreen class="rounded"></iframe>
+                    </div>
+                {% endif %}
+                <p class="card-text text-secondary">{{ vlog.description|truncatewords:30 }}</p>
+                <a href="{% url 'vlog-detail' vlog.id %}" class="btn btn-sm btn-primary">Read More</a>
+            </div>
+
+            <!-- Card Footer: Tags -->
+            {% if vlog.tags %}
+            <div class="card-footer bg-light border-0 rounded-bottom-4">
+                {% for tag in vlog.tags.all %}
+                    <span class="badge bg-info text-dark">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    {% if is_paginated %}
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+    {% endif %}
+  </ul>
+</nav>
+
+{% endblock %}

@@ -1,0 +1,54 @@
+<!-- templates/vlogs/_form_fields.html -->
+{% if form.errors %}
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      {% for field in form %}
+        {% for error in field.errors %}
+          <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+      {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<div class="modal-body">
+  {% for field in form %}
+    {% if field.field.widget|slice:":10" == "Select" %}
+      <!-- Select fields (category/tags) -->
+      <div class="mb-3">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in field.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% elif field.field.widget|slice:":8" == "Textarea" %}
+      <!-- Textarea fields (description) -->
+      <div class="form-floating mb-3">
+        {{ field }}
+        {{ field.label_tag }}
+        {% if field.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in field.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% else %}
+      <!-- Regular input fields -->
+      <div class="form-floating mb-3">
+        {{ field }}
+        {{ field.label_tag }}
+        {% if field.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in field.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
