@@ -53,9 +53,11 @@
             <div class="card-body bg-white">
                 <h5 class="card-title text-primary fw-bold">{{ vlog.title }}</h5>
                 {% if vlog.video_url %}
-                    <div class="ratio ratio-16x9 mb-3">
+                    <a href="{{ vlog.video_url }}">{{ vlog.video_url }}</a>
+                    <!-- <div class="ratio ratio-16x9 mb-3">
                         <iframe src="{{ vlog.video_url }}" title="{{ vlog.title }}" allowfullscreen class="rounded"></iframe>
-                    </div>
+                    </div> -->
+                    
                 {% endif %}
                 <p class="card-text text-secondary">{{ vlog.description|truncatewords:30 }}</p>
                 <a href="{% url 'vlog-detail' vlog.id %}" class="btn btn-sm btn-primary">Read More</a>
