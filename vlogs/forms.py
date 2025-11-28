@@ -11,7 +11,7 @@ class VlogPostForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add Bootstrap classes and placeholders
+        
         self.fields['title'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': 'Enter vlog title'
