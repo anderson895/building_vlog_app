@@ -76,4 +76,4 @@ class UserLoginView(LoginView):
 # vlogs/views.py
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('vlog-list')
-    allow_get = True  # <-- Add this to allow GET requests
+    allow_get = True  
