@@ -1,7 +1,14 @@
 # vlogs/admin.py
 from django.contrib import admin
-from .models import VlogPost
+from .models import VlogPost, Category
 
+# Register Category
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
+# Register VlogPost
 @admin.register(VlogPost)
 class VlogPostAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'published_date', 'category')

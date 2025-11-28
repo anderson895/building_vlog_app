@@ -3,9 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import VlogPost
 
-# ------------------------------
-# VlogPost Form
-# ------------------------------
+
 class VlogPostForm(forms.ModelForm):
     class Meta:
         model = VlogPost
@@ -35,9 +33,7 @@ class VlogPostForm(forms.ModelForm):
             'class': 'form-select'
         })
 
-# ------------------------------
-# User Registration Form
-# ------------------------------
+
 class UserRegisterForm(UserCreationForm):
     username = forms.CharField(
         max_length=150,
