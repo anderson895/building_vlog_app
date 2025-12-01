@@ -1,11 +1,20 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
+from django.views.generic import (
+    ListView, DetailView, CreateView,
+    UpdateView, DeleteView
+)
 from django.contrib.auth.views import LoginView, LogoutView
+from django.views import View
+from django.shortcuts import render, redirect
+
 from .models import VlogPost
 from .forms import VlogPostForm, UserRegisterForm, UserLoginForm
 
-# List view
+
+# ------------------------------
+# VLOG LIST VIEW
+# ------------------------------
 class VlogListView(LoginRequiredMixin, ListView):
     model = VlogPost
     template_name = 'vlogs/vlog_list.html'
@@ -18,14 +27,20 @@ class VlogListView(LoginRequiredMixin, ListView):
         context['form'] = VlogPostForm()
         return context
 
-# Detail view
+
+# ------------------------------
+# VLOG DETAIL VIEW
+# ------------------------------
 class VlogDetailView(DetailView):
     model = VlogPost
     template_name = 'vlogs/vlog_detail.html'
     context_object_name = 'vlog'
     pk_url_kwarg = 'id'
 
-# Create view
+
+# ------------------------------
+# CREATE VLOG
+# ------------------------------
 class VlogCreateView(LoginRequiredMixin, CreateView):
     model = VlogPost
     form_class = VlogPostForm
@@ -36,19 +51,25 @@ class VlogCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-# Update view
+
+# ------------------------------
+# UPDATE VLOG
+# ------------------------------
 class VlogUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = VlogPost
     form_class = VlogPostForm
     template_name = 'vlogs/vlog_form.html'
-    success_url = reverse_lazy('vlog-list')
     pk_url_kwarg = 'id'
+    success_url = reverse_lazy('vlog-list')
 
     def test_func(self):
         vlog = self.get_object()
-        return self.request.user == vlog.author
+        return vlog.author == self.request.user
 
-# Delete view
+
+# ------------------------------
+# DELETE VLOG
+# ------------------------------
 class VlogDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = VlogPost
     template_name = 'vlogs/vlog_confirm_delete.html'
@@ -57,23 +78,39 @@ class VlogDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def test_func(self):
         vlog = self.get_object()
-        return self.request.user == vlog.author
+        return vlog.author == self.request.user
 
-# User registration/login views
-class UserRegisterView(FormView):
-    template_name = 'vlogs/register.html'
-    form_class = UserRegisterForm
-    success_url = reverse_lazy('login')
 
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-class UserLoginView(LoginView):
+# ------------------------------
+# CUSTOM LOGIN VIEW
+# ------------------------------
+class CustomLoginView(LoginView):
     template_name = 'vlogs/login.html'
     authentication_form = UserLoginForm
 
-# vlogs/views.py
-class UserLogoutView(LogoutView):
-    next_page = reverse_lazy('vlog-list')
-    allow_get = True  
+    # Fix redirect so it never goes to /accounts/profile/
+    def get_success_url(self):
+        return reverse_lazy('vlog-list')
+
+
+# ------------------------------
+# CUSTOM LOGOUT VIEW
+# ------------------------------
+class CustomLogoutView(LogoutView):
+    next_page = 'login'
+
+
+# ------------------------------
+# REGISTER VIEW
+# ------------------------------
+class RegisterView(View):
+    def get(self, request):
+        form = UserRegisterForm()
+        return render(request, 'vlogs/register.html', {'form': form})
+
+    def post(self, request):
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+        return render(request, 'vlogs/register.html', {'form': form})
